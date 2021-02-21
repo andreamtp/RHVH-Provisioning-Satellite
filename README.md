@@ -14,13 +14,13 @@ Download the RHVH ISO and place it somewhere in the filesystem, i.e. `/var/tmp`
 
 Create the needed directory structure on the Satellite server (or capsule) under the public directory for direct access:
 ```
-mkdir -p /var/www/html/pub/rhvh/images/pxeboot /var/www/html/pub/rhvh/LiveOS
+mkdir -p /var/www/html/pub/rhvh/images/pxeboot
 ```
 
 Mount the ISO file and extract the needed files in the public directory. We need the kernel, the initram image, the LiveOS squashfs image, and the RHVH squashfs image which is inside an rpm:
 ```
 mkdir -p /mnt/rhvh
-mount -t iso9660 -o ro /var/tmp/RHVH-4.3-*-RHVH-x86_64-dvd1.iso /mnt/rhvh/
+mount -t iso9660 -o ro /var/tmp/RHVH-4.4-*-RHVH-x86_64-dvd1.iso /mnt/rhvh/
 
 mkdir -p /tmp/rhvh && cd /tmp/rhvh
 
@@ -28,9 +28,8 @@ rpm2cpio /mnt/rhvh/Packages/redhat-virtualization-host-image-update* | cpio -imd
 mv ./usr/share/redhat-virtualization-host/image/redhat-virtualization-host-*img /var/www/html/pub/rhvh/images/
 
 cp -a /mnt/rhvh/images/pxeboot/{initrd.img,vmlinuz} /var/www/html/pub/rhvh/images/pxeboot/
-cp -a /mnt/rhvh/images/product.img /var/www/html/pub/rhvh/images/
+cp -a /mnt/rhvh/images/{product,install}.img /var/www/html/pub/rhvh/images/
 cp -a /mnt/rhvh/.treeinfo /var/www/html/pub/rhvh/
-cp -a /mnt/rhvh/LiveOS/squashfs.img /var/www/html/pub/rhvh/LiveOS/
 
 umount /mnt/rhvh
 
