@@ -2,9 +2,9 @@
 
 ## What you need
 
-* A running Satellite server
+* A running Satellite 6.8 or later version
 * Some bare metal hosts to provision
-* The latest RHVH ISO from the [Red Hat Customer Portal](https://access.redhat.com/downloads/content/415/ver=4.3/rhel---7/4.3/x86_64/product-software) (subscription needed)
+* The latest RHVH 4.4 ISO from the [Red Hat Customer Portal](https://access.redhat.com/downloads/content/415/ver=4.4/rhel---8/4.4/x86_64/product-software) (subscription needed)
 
 ## Setting up Satellite : the files
 
@@ -47,29 +47,32 @@ In the Satellite WebUI, create a new *InstallationMedia* named i.e. `RHVH` with 
 
 The path here should point to the publicly accessible directory we created earlier. Please note it's *http* and **not** *https*
 
-In the Satellite WebUI, create a new *OperatingSystem* named i.e. `RHVH 4.3` with the following specs:
+In the Satellite WebUI, create a new *OperatingSystem* named i.e. `RHVH 4.4` with the following specs:
  * Name: `RedHat`
- * Major: `4`
+ * Major: `8`
  * Minor: `3`
- * Description: `RHVH 4.3`
+ * Description: `RHVH 4.4`
  * Family: `Red Hat`
  * Arch: `x86_64`
  * Partition Table: `Kickstart default thin`
  * Installation Media: `RHVH`
 
-In the Satellite WebUI, associate the RHVH templates `Kickstart oVirt-RHVH` and `Kickstart oVirt-RHVH PXELinux` with the newly created *OperatingSystem* `RHVH 4.3`
+The reason why we are declaring such major and minor version is because RHVH 4.4 is based on RHEL 8.3 and various provisioning templates in Satallite 6 distinguish the os according to Family, Major and Minor, and have specific behaviour if the OS is RHEL 8.3, due to some changes in the installer, Anaconda. In order to avoid to add another IF just for RHVH, we present RHVH 4.4 as RHEL 8.3 in order to match those.
+
+In the Satellite WebUI, associate the RHVH templates `Kickstart oVirt-RHVH` and `Kickstart oVirt-RHVH PXELinux` with the newly created *OperatingSystem* `RHVH 4.4`
 * Hosts -> Provisioning Templates -> select the template -> Association
 
 Of course you may use your own provisioning and pxelinux templates. In this repo you'll find a slightly modified version of the two templates:
 * [Baremetal Kickstart oVirt-RHVH](baremetal_kickstart_ovirtrhvh.erb) providing automated remote execution user creation
 * [Baremetal Kickstart oVirt-RHVH PXELinux](baremetal_kickstart_ovirtrhvh_pxelinux.erb) providing kernel cmdline parameters for setting up static ip during boot, when subnet is not set on DHCP.
 
-Set the default templates in the *Operating System* `RHVH 4.3` and set some parameters:
+Set the default templates in the *Operating System* `RHVH 4.4` and set some parameters:
  * PXELinux Template: `Kickstart oVirt-RHVH PXELinux`
  * Provisioning Template: `Kickstart oVirt-RHVH`
  * Parameters: 
    * `disable-firewall` (boolean) = `false` ; *RHVH hosts need Firewalld to be enabled*
    * `liveimg_name` (string) = `http://satellite.example.com/pub/rhvh/images/redhat-virtualization-host-4.3.9-20200324.0.el7_8.squashfs.img` ; *This is the file we extracted earlier. It is used in the provisioning template*
+   * `kickstart_liveimg` (boolean) ) `true` ; *This specify that RHVH use and image as installation technology and need a slightly different kickstart 
    * [optional] `kt_activation_keys` (string) = `myactivationkey` *Set this if you plan on subscribing hosts during installation*
 
 You may also set the activation key parameter in a hostgroup, if you prefer.
